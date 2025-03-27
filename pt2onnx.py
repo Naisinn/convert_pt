@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import torch
 import os
+import subprocess
 
 def main():
     # 変換対象の.ptファイルのパスを入力
@@ -51,6 +52,17 @@ def main():
         print(f"ONNXファイルが保存されました: {onnx_path}")
     except Exception as e:
         print(f"ONNXへの変換中にエラーが発生しました: {e}")
+
+    # 以下追加：onnx2caffeを利用してprototxt（およびcaffemodel）ファイルを出力する
+    # 出力先はONNXファイルと同じディレクトリ、拡張子をそれぞれ.prototxt, .caffemodelに変更
+    prototxt_path = base + ".prototxt"
+    caffemodel_path = base + ".caffemodel"
+    try:
+        cmd = f"python convertCaffe.py {onnx_path} {prototxt_path} {caffemodel_path}"
+        subprocess.run(cmd, shell=True, check=True)
+        print(f"prototxtファイルとcaffemodelファイルが保存されました: {prototxt_path}, {caffemodel_path}")
+    except Exception as e:
+        print(f"onnx2caffe の実行中にエラーが発生しました: {e}")
 
 if __name__ == '__main__':
     main()
